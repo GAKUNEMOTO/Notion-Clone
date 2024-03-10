@@ -8,31 +8,33 @@ require("dotenv").config();
 
 
 
-// ユーザー新規登録 
-router.post("/register", 
-// バリデーションチェック
-body("username")
-    .isLength({min:8})
-    .withMessage("ユーザー名は８文字以上である必要があります"),
-body("password")
-    .isLength({min:8})
-    .withMessage("パスワードは８文字以上である必要があります"),
-body("confirmPassword")
-    .isLength({min:8})
-    .withMessage("確認パスワードは８文字以上である必要があります"),
-body("username").custom((value) => {
-    return User.findOne({username: value}).then((user) => {
-        if(user) {
+router.post("/register", [
+    // Validation checks
+    body("username")
+      .isLength({ min: 8 })
+      .withMessage("ユーザー名は８文字以上である必要があります"),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("パスワードは８文字以上である必要があります"),
+    body("confirmPassword")
+      .isLength({ min: 8 })
+      .withMessage("確認パスワードは８文字以上である必要があります"),
+    body("username")
+      .custom((value) => {
+        // Check for duplicate username
+        return User.findOne({ username: value }).then((user) => {
+          if (user) {
             return Promise.reject("このユーザーはすでに使われています");
-        }
-    });
-    
-}),
-// バリデーションのエラーを出力する機能
-validation.validates,
-userController.register
-);
-
+          }
+        });
+      }),
+    // Validation error handling
+    validation.validates,
+  ], (req, res) => {
+    // User registration logic
+    userController.register(req, res);
+  });
+  
 // ログイン用API
 router.post("/login",
  body("username")
