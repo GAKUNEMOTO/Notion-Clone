@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 const mongoose = require("mongoose");
 const cors = require('cors');
 require("dotenv").config();
@@ -19,11 +19,11 @@ app.use("/api/v1", require("./src/v1/routes"));
 
 // DB接続
 try {
-    mongoose.connect(process.env.MONGODB_URL);
-    console.log("DBと接続中");
-  } catch (error) {
-    console.log(error);
-  }
+  await mongoose.connect(process.env.MONGODB_URL);
+  console.log("DBと接続中");
+} catch (error) {
+  console.error("DB接続エラー:", error);
+}
 
 
 app.listen(PORT, () => {
